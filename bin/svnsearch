@@ -32,7 +32,6 @@ EOF
 
 svnSearch() {
     # echo "DEBUG: 1 is ${1} and 2 is ${2}."
-    warningMessage
     if [ -n "${2}" ]
     then
         svn log -l "${2}" --search "${1}"

@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+
+# This is used to merge changes from one branch into another.
+
+########
+# HELP #
+########
+
+myHelp() {
+# Unlike Python's "argparse," Bash's "getopts" doesn't auto-generate
+# the help or keep this "help" output up-to-date: you have to do that.
+echo -e "\033[1;31mThis merges from one branch into another.\033[0m\n"
+echo -e "\033[1;33mUse a single revision number, or multiple numbers separated by commas only. Do not use spaces.\033[0m\n"
+
+cat << EOF
+Usage:
+    $(basename "${0}") [-h] [revisions number(s)]
+
+Examples: 
+    svnmerge 12345
+    svnmerge 12345,12346,12347
+
+Args:
+-h  Show this help and exit
+EOF
+}
+
+###########
+# PROCESS #
+###########
+
+# This is set to development by default. Change it to whichever you use most.
+# TODO: Make it possible to dynamically choose which branch to use.
+svnMerge() {
+    svn merge -c"${1}" "^/branches/development"
+}
+
+while getopts ":h" opt
+do
+    case ${opt} in
+        h)
+            myHelp
+            exit 0
+            ;;
+        \?)
+            echo -e "\033[1;31mInvalid option: -${OPTARG}\033[0m\n" >&2
+            myHelp
+            exit 1
+            ;;
+        :)
+            # 2017-08-03: no option currently requires an option, but this
+            # is how to handle it if that changes.
+            echo -e "\033[1;31mOption -${OPTARG} requires an argument.\033[0m\n" >&2
+            myHelp
+            exit 1
+            ;;
+    esac
+done
+
+shift $((OPTIND-1))
+commits="${*}"
+
+svnMerge "${commits}"

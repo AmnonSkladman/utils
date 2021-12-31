@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+
+# Use this to search for specific SVN commits.
+# You can also indicate specific number of commits
+# you want to look through. Default is set to 100.
+
+########
+# HELP #
+########
+
+myHelp() {
+# Unlike Python's "argparse," Bash's "getopts" doesn't auto-generate
+# the help or keep this "help" output up-to-date: you have to do that.
+echo -e "\033[1;33mSearch for specific commits using a single query.\033[0m"
+echo -e "\033[1;33mYou can also indicate specific number of commits to look through.\033[0m\n"
+cat << EOF
+Usage:
+    $(basename "${0}") [-h] [query] [number of commits]
+
+Examples:
+    svnsearch TR-123
+    svnsearch TR-123 457
+
+Args:
+-h  Show this help and exit
+EOF
+}
+
+###########
+# PROCESS #
+###########
+
+svnSearch() {
+    # echo "DEBUG: 1 is ${1} and 2 is ${2}."
+    warningMessage
+    if [ -n "${2}" ]
+    then
+        svn log -l "${2}" --search "${1}"
+    else
+        svn log -l 100 --search "${1}"
+    fi
+}
+
+while getopts ":h" opt
+do
+    case ${opt} in
+        h)
+            myHelp
+            exit 0
+            ;;
+        \?)
+            echo -e "\033[1;31mInvalid option: -${OPTARG}\033[0m\n" >&2
+            myHelp
+            exit 1
+            ;;
+        :)
+            # 2017-08-03: no option currently requires an option, but this
+            # is how to handle it if that changes.
+            echo -e "\033[1;31mOption -${OPTARG} requires an argument.\033[0m\n" >&2
+            myHelp
+            exit 1
+            ;;
+    esac
+done
+
+svnSearch "${1}" "${2}"

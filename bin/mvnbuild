@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 
-# Use this to search for specific SVN commits.
-# You can also indicate specific number of commits
-# you want to look through. Default is set to 100.
+# Use this to build your files using Maven.
+# Use this in a repo that uses Maven and SASS.
 
 ########
 # HELP #
